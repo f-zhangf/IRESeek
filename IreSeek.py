@@ -152,7 +152,7 @@ def soft_voting(models,device, data_loader, use_fea,path = "",use_softmax=False)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i','--input_file', default=None, metavar='', type=str, required=True, help='please make sure your input is .fa or .fasta fomat ')
+    parser.add_argument('-i','--input_file', default=None, metavar='', type=str, required=True, help='please make sure your input file is .fa or .fasta fomat ')
     parser.add_argument('-s','--split',action='store_true',help='If set, the input sequences will be split,')
     parser.add_argument('-w','--window',default=174, help='when split is enabled, the window will be used.', metavar='', type=int)
     parser.add_argument('-g', '--interval',default=10,help='when split is enabled, the Sliding window interval be used .',metavar='',type=int)
