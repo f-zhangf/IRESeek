@@ -1,4 +1,4 @@
-name: pytorch240_cuda211
+name: IRESeek
 channels:
   - pytorch
   - dglteam/label/th24_cu121
@@ -202,4 +202,4 @@ dependencies:
       - logging-exceptions==0.1.9
       - viennarna==2.7.0
       - weblogo==3.7.12
-prefix: /public2/home/ustc_zfw/anaconda3/envs/pytorch240_cuda211
+prefix: /public2/home/ustc_zfw/anaconda3/envs/IRESeek
