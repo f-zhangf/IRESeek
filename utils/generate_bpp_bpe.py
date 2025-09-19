@@ -7,7 +7,7 @@ from tqdm import tqdm
 import scipy.sparse as sp
 from functools import partial
 from utils.rna_utils import load_seq_bppe
-from BPfold.BPfold.util.base_pair_motif import BPM_energ
+from BPfold.util.base_pair_motif import BPM_energy
 def fold_seq_rnaplfold(seq, w, l, cutoff, no_lonely_bps):
     np.random.seed(random.seed())
     name = str(np.random.rand())
@@ -77,6 +77,7 @@ def fold_rna_from_file(seq_path,sav_bpp_path,sava_bpe_path):
         np.save(sava_bpe_path + "/" + all_id[idx] + ".npy",mat2)
 if __name__ == '__main__':
     basedir = os.getcwd()
+    #fold_rna_from_file()
     #read_negative_file =basedir +"/all_test/IRES_newtest_seq/55k_newtest_negative.fa"
     #sava_negative =basedir + "/all_test/IRES_newtest_BPP/negative"
     #fold_rna_from_file(read_negative_file,sava_negative)
