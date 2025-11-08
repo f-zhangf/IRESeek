@@ -82,19 +82,21 @@ def gpu_setup(use_gpu, gpu_id):
     return device
 
 def device_set():
-    gpu_id = select_free_gpu()
-    if gpu_id is not None:
-        gpu_use = True
-        print(f"Selected GPU: {gpu_id}")
-    else:
-         gpu_use = False
-         print("No suitable GPU found.")  
+    #gpu_id = select_free_gpu()
+    #if gpu_id is not None:
+        #gpu_use = True
+        #print(f"Selected GPU: {gpu_id}")
+    #else:
+         #gpu_use = False
+         #print("No suitable GPU found.")
+    gpu_id = 0 
+    gpu_use = torch.cuda.is_available()
     return gpu_id,gpu_setup(gpu_use,gpu_id)
-def load_model(MODEL_NAME, net_params,path):
+def load_model(MODEL_NAME, net_params,path,device):
 
     model = get_model(MODEL_NAME, net_params)
     PATH = path
-    model.load_state_dict(torch.load(PATH))
+    model.load_state_dict(torch.load(PATH,map_location=device))
     return model
 
 def soft_voting(models,device, data_loader, use_fea,path = "",use_softmax=False):
@@ -152,7 +154,8 @@ def soft_voting(models,device, data_loader, use_fea,path = "",use_softmax=False)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i','--input_file', default=None, metavar='', type=str, required=True, help='please make sure your input file is .fa or .fasta fomat ')
+    parser.add_argument('-d','--dataset',default=None, type=str,help='Preprocessed dataset filename.')
+    parser.add_argument('-f','--input_file', default=None, metavar='', type=str, help='please make sure your input file is .fa or .fasta format ')
     parser.add_argument('-s','--split',action='store_true',help='If set, the input sequences will be split,')
     parser.add_argument('-w','--window',default=174, help='when split is enabled, the window will be used.', metavar='', type=int)
     parser.add_argument('-g', '--interval',default=10,help='when split is enabled, the Sliding window interval be used .',metavar='',type=int)
@@ -167,18 +170,19 @@ if __name__ == '__main__':
     sava_pkl_path = base_path +'/ProcessData/IRES_Pkl'
     sava_pred_path = base_path + '/ProcessData/IRES_Predict' 
 
-
-    if args.split:
-        input_file_path = seq_path + input_file
-        output_file_path = seq_path + f'process_{input_file}'
-        cmd = f'seqkit sliding -s {args.interval} -W {args.window} -C {input_file_path} > {output_file_path}'
-        subprocess.call(cmd, shell=True)
-        input_file = f'process_{input_file}'
-    #step 1 generate bpp and bpe
-    fold_rna_from_file(seq_path + input_file,bpp_data_path,bpe_data_path)
-
-    #step 2 process data to get pkl 
-    get_graph(seq_path + input_file,bpe_data_path,bpp_data_path,sava_pkl_path)
+    if args.dataset is None:
+        if args.split:
+            input_file_path = seq_path + input_file
+            output_file_path = seq_path + f'process_{input_file}'
+            cmd = f'seqkit sliding -s {args.interval} -W {args.window} -C {input_file_path} > {output_file_path}'
+            subprocess.call(cmd, shell=True)
+            input_file = f'process_{input_file}'
+        #step 1 generate bpp and bpe
+        fold_rna_from_file(seq_path + input_file,bpp_data_path,bpe_data_path)
+        #step 2 process data to get pkl 
+        get_graph(seq_path + input_file,bpe_data_path,bpp_data_path,sava_pkl_path)
+    else:
+        sava_pkl_path = sava_pkl_path +'/args.dataset'
 
     #step 3 begin predict ires
     id,device = device_set()
@@ -215,10 +219,10 @@ if __name__ == '__main__':
     under3_path = model_base_path + 'under3/model_1.pth'
 
 
-    over_model = load_model("IreeSeek_conv",net_params,over_path).to(device)
-    under1_model = load_model("IreeSeek_conv",net_params,under1_path).to(device)
-    under2_model = load_model("IreeSeek_conv",net_params,under2_path).to(device)
-    under3_model = load_model("IreeSeek_conv",net_params,under3_path).to(device)
+    over_model = load_model("IreeSeek_conv",net_params,over_path,device).to(device)
+    under1_model = load_model("IreeSeek_conv",net_params,under1_path,device).to(device)
+    under2_model = load_model("IreeSeek_conv",net_params,under2_path,device).to(device)
+    under3_model = load_model("IreeSeek_conv",net_params,under3_path,device).to(device)
 
     models =[over_model,under1_model,under2_model,under3_model]
  
